@@ -104,3 +104,17 @@ export async function updateRental(req, res) {
         res.send(error).status(500)
     }
 }
+
+export async function deleteRental(req, res) {
+    const rentalId = req.params.id
+
+    try {
+
+        await db.query('DELETE FROM rentals WHERE id=$1', [rentalId])
+
+        res.sendStatus(200)
+        
+    } catch (error) {
+        res.send(error).status(500)
+    }
+}
