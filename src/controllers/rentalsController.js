@@ -13,8 +13,8 @@ export async function getRentals(req, res) {
                 customers.name AS "customer_Name",
                 games.id AS "game_Id",
                 games.name AS "game_Name",
-                category.id AS "category_Id",
-                category.name AS "category_Name"
+                categories.id AS "category_Id",
+                categories.name AS "category_Name"
             FROM rentals
                 JOIN customers ON customers.id=rentals."customerId"
                 JOIN games ON games.id=rentals."gameId"
@@ -72,6 +72,33 @@ export async function postRental(req, res) {
 
         res.sendStatus(201)
 
+    } catch (error) {
+        res.send(error).status(500)
+    }
+}
+
+export async function updateRental(req, res) {
+    const rentalId = req.params.id
+    const returnDate = dayjs().format('YYYY-MM-DD')
+    const daysDelayed = dayjs().diff(dayjs(req.locals.rentDate).add(parseInt(req.locals.daysRented), 'day'), 'day')
+    const pricePerDay = parseInt(req.locals.originalPrice) / parseInt(req.locals.daysRented)
+    let delayFee = 0
+
+    if(daysDelayed > 0) {
+        delayFee = parseInt(daysDelayed) * pricePerDay
+    }
+
+    try {
+
+        await db.query(`
+            UPDATE rentals
+            SET "returnDate" = $1
+                "delayFee" = $2
+            WHERE id = $3
+        `, [returnDate, delayFee, rentalId])
+
+        res.sendStatus(200)
+        
     } catch (error) {
         res.send(error).status(500)
     }

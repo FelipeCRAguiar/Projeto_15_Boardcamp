@@ -1,7 +1,7 @@
 import db from "../../db.js";
 import rentalSchema from "../schemas/rentalSchema.js";
 
-export default async function validateRental(req, res, next) {
+export async function validateRental(req, res, next) {
     const validation = rentalSchema.validate(req.body)
 
     if(validation.error) {
@@ -38,6 +38,30 @@ export default async function validateRental(req, res, next) {
             return res.sendStatus(400)
         }
 
+    } catch (error) {
+        res.send(error).status(500)
+    }
+
+    next()
+}
+
+export async function validateCheckout(req, res, next) {
+    const rentalId = req.params.id
+
+    try {
+
+        const rental = await db.query('SELECT * FROM rentals WHERE id=$1', [rentalId])
+
+        if(rental.rowCount === 0) {
+            return res.sendStatus(404)
+        }
+
+        if(rental.rows[0].returnDate !== null) {
+            return res.sendStatus(400)
+        }
+
+        req.locals = rental.rows[0]
+        
     } catch (error) {
         res.send(error).status(500)
     }
