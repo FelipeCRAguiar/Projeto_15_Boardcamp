@@ -55,3 +55,24 @@ export async function getRentals(req, res) {
         res.send(error).status(500)
     }
 }
+
+export async function postRental(req, res) {
+    const rental = req.body
+    const rentDate = dayjs().format('YYYY-MM-DD')
+
+    try {
+
+        const pricePerDay = await db.query('SELECT * FROM games WHERE id=$1', [rental.gameId])
+        
+        await db.query(`
+            INSERT INTO 
+                rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee")
+            VALUES ($1, $2, $3, $4, null, $5, null)
+        `, [rental.customerId, rental.gameId, rentDate, rental.daysRented, pricePerDay.rows[0].pricePerDay * rental.daysRented])
+
+        res.sendStatus(201)
+
+    } catch (error) {
+        res.send(error).status(500)
+    }
+}
