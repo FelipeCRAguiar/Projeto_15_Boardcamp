@@ -12,7 +12,7 @@ export async function getGames(req, res) {
                 categories.name AS "categoryName"
             FROM games
                 JOIN categories ON categories.id=games."categoryId"
-            WHERE LOWER(name) LIKE LOWER($1)`, [`${name}%`])
+            WHERE LOWER(games.name) LIKE LOWER($1)`, [`${name}%`])
             
 
             return res.send(gamesQuery.rows).status(201)
