@@ -45,7 +45,7 @@ export async function validateRental(req, res, next) {
     next()
 }
 
-export async function validateCheckout(req, res, next) {
+export async function validateReturn(req, res, next) {
     const rentalId = req.params.id
 
     try {

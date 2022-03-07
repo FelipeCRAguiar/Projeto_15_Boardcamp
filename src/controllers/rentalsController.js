@@ -27,6 +27,7 @@ export async function getRentals(req, res) {
             const item = {
                 ...el,
                 rentDate: dayjs(el.rentDate).format("YYYY-MM-DD"),
+                returnDate: el.returnDate && dayjs(el.returnDate).format("YYYY-MM-DD"),
                 customer: {
                     id: el.customer_Id,
                     name: el.customer_Name
@@ -92,8 +93,8 @@ export async function updateRental(req, res) {
 
         await db.query(`
             UPDATE rentals
-            SET "returnDate" = $1
-                "delayFee" = $2
+                SET "returnDate" = $1,
+                    "delayFee" = $2
             WHERE id = $3
         `, [returnDate, delayFee, rentalId])
 
