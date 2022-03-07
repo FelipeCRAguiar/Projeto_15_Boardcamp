@@ -37,3 +37,17 @@ export async function getCustomerId(req, res) {
         res.send(error).status(500)
     }
 }
+
+export async function postCustomer(req, res) {
+    const customer = req.body
+
+    try {
+
+        await db.query('INSERT INTO customers (name, phone, cpf, birthday) VALUES ($1, $2, $3, $4)', [customer.name, customer.phone, customer.cpf, customer.birthday])
+
+        res.sendStatus(201)
+        
+    } catch (error) {
+        res.send(error).status(500)
+    }
+}
