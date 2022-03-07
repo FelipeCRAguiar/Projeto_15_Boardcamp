@@ -7,12 +7,13 @@ export async function getGames(req, res) {
 
         if (name) {
             const gamesQuery = await db.query(`
-                SELECT 
-                    games.*, 
-                    categories.name AS "categoryName"
-                FROM games
-                    JOIN categories ON categories.id=games."categoryId"
-                WHERE LOWER(name) LIKE LOWER($1)`, [`${name}%`])
+            SELECT 
+                games.*, 
+                categories.name AS "categoryName"
+            FROM games
+                JOIN categories ON categories.id=games."categoryId"
+            WHERE LOWER(name) LIKE LOWER($1)`, [`${name}%`])
+            
 
             return res.send(gamesQuery.rows).status(201)
         }

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import db from "../../db.js";
 
 export async function getCustomers(req, res) {
@@ -8,12 +9,14 @@ export async function getCustomers(req, res) {
         if(cpf) {
             const customersQuery = await db.query('SELECT * FROM customers WHERE cpf LIKE $1', [`${cpf}%`])
 
-            return res.send(customersQuery).status(201)
+            return res.send(customersQuery.rows).status(201)
         }
 
         const customers = await db.query('SELECT * FROM customers')
 
-        res.send(customers).status(201)
+        const customersFixed = customers.rows.map(el => ({...el, birthday: dayjs(el.birthday).format('YYYY-MM-DD')}))
+
+        res.send(customersFixed).status(201)
 
     } catch (error) {
         res.send(error).status(500)
@@ -31,7 +34,9 @@ export async function getCustomerId(req, res) {
             return res.sendStatus(404)
         }
 
-        res.send(customer).status(201)
+        const customerFixed = customer.rows.map(el => ({...el, birthday: dayjs(el.birthday).format('YYYY-MM-DD')}))
+
+        res.send(customerFixed).status(201)
 
     } catch (error) {
         res.send(error).status(500)
@@ -47,6 +52,27 @@ export async function postCustomer(req, res) {
 
         res.sendStatus(201)
         
+    } catch (error) {
+        res.send(error).status(500)
+    }
+}
+
+export async function updateCustomer(req, res) {
+    const customer = req.body
+    const id = req.params.id
+
+    try {
+        
+        await db.query(`
+            UPDATE customers 
+            SET name = $2, 
+                phone = $3,
+                cpf = $4,
+                birthday = $5
+            WHERE id = $1`, [id, customer.name, customer.phone, customer.cpf, customer.birthday])
+
+        res.sendStatus(200)
+
     } catch (error) {
         res.send(error).status(500)
     }

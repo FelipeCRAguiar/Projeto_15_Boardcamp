@@ -14,13 +14,13 @@ export default async function validateCustomer(req, res, next) {
 
         const result = await db.query('SELECT * FROM customers WHERE cpf=$1', [customer.cpf])
 
-        if(result.rowCount !== 0) {
+        if(result.rowCount !== 0 && result.rows[0].id !== customer.id) {
             return res.sendStatus(409)
         }
         
+    next() 
     } catch (error) {
         res.send(error).status(500)
     }
 
-    next() 
 }
